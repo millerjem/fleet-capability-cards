@@ -16,6 +16,15 @@ docker compose up --build
 
 Open [localhost:8080](http://localhost:8080). Stop with `docker compose down`.
 
+A prebuilt Linux amd64 container is also available from [GitHub Releases](https://github.com/millerjem/fleet-capability-cards/releases/latest). Download `fleet-capability-cards-demo.tar.gz`, then run:
+
+```sh
+docker load -i fleet-capability-cards-demo.tar.gz
+docker run --rm -p 127.0.0.1:8080:8080 fleet-capability-cards:demo
+```
+
+For Apple Silicon or other architectures, use the Compose source build above.
+
 The multi-stage build compiles the React demo and serves it through unprivileged Nginx on port 8080. Compose binds to your computer's loopback interface. No API keys, login, cluster, external fonts, maps, telemetry feeds, or backend are needed.
 
 1. Select Rover, Kite, or Atlas.
@@ -30,7 +39,7 @@ All data, approvals, and rollouts in this demo are synthetic and kept in memory.
 
 Requires React 18.2+ or React 19, with React DOM. Build tooling requires Node 22.12+; Docker uses Node 24.
 
-The source is public on GitHub. **It has not been published to the npm registry.** Build an installable package from the checkout:
+The source is public on GitHub. **It has not been published to the npm registry.** Download the installable `.tgz` from [GitHub Releases](https://github.com/millerjem/fleet-capability-cards/releases/latest), or build it from the checkout:
 
 ```sh
 npm ci
@@ -209,7 +218,7 @@ npm pack --dry-run       # Inspect the installable package
 npx prettier --check src demo tests '*.js' '*.mjs' '*.json'
 ```
 
-CI runs interaction tests, builds the library/demo, checks consumer types and package contents, then builds and starts the Docker demo and checks its health endpoint. The container is built from this repository; the image is not published to a container registry by this workflow.
+CI runs interaction tests, builds the library/demo, checks consumer types and package contents, then builds and starts the Docker demo and checks its health endpoint. Tagged releases repeat validation and publish the installable React package and a prebuilt Linux amd64 Docker image archive to public GitHub Releases. Images are distributed as release downloads rather than through a container registry.
 
 ## License
 

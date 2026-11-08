@@ -1,0 +1,37 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "24", cache: npm }
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:demo
+      - run: npx tsc
+      - run: npm pack
+      - run: docker build -t fleet-capability-cards:demo .
+      - name: Check and export demo container
+        run: |
+          set -euo pipefail
+          docker run -d --name fleet-cards -p 127.0.0.1:8080:8080 fleet-capability-cards:demo
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8080/health; then break; fi
+            sleep 1
+          done
+          curl --fail http://127.0.0.1:8080/health
+          curl --fail http://127.0.0.1:8080/ | grep 'Fleet capability cards'
+          docker save fleet-capability-cards:demo | gzip > fleet-capability-cards-demo.tar.gz
+      - name: Publish public release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            millerjem-fleet-capability-cards-*.tgz fleet-capability-cards-demo.tar.gz \
+            --title "Fleet capability cards $GITHUB_REF_NAME" --notes-file RELEASE_NOTES.md
