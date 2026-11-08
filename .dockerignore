@@ -1,0 +1,9 @@
+.git
+node_modules
+dist
+demo-dist
+*.tgz
+.env
+.env.*
+*.secret
+coverage

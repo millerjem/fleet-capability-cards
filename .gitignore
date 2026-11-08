@@ -1,0 +1,9 @@
+node_modules/
+dist/
+demo-dist/
+*.tgz
+.env
+.env.*
+*.secret
+.DS_Store
+coverage/
